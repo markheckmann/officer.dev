@@ -56,6 +56,10 @@ read_pptx() |>
   print(preview = TRUE)
 ```
 
+```{r echo=FALSE, out.width="80%"}
+knitr::include_graphics("img_phs_annotate_subset.png")
+```
+
 ### Annotating multiple slides
 
 Use `.slide_idx` to annotate specific slides or all slides at once:
@@ -65,6 +69,10 @@ x <- read_pptx()
 x <- add_slide(x, "Title and Content")
 x <- add_slide(x, "Two Content")
 x <- phs_annotate(x, .slide_idx = "all")
+```
+
+```{r echo=FALSE, out.width="80%"}
+knitr::include_graphics("img_phs_annotate_all_slides.png")
 ```
 
 ### Customizing appearance
@@ -80,6 +88,10 @@ read_pptx() |>
   print(preview = TRUE)
 ```
 
+```{r echo=FALSE, out.width="80%"}
+knitr::include_graphics("img_phs_annotate_custom.png")
+```
+
 Show only labels (hide type and id):
 
 ```{r eval=FALSE}
@@ -87,6 +99,10 @@ read_pptx() |>
   add_slide("Title Slide") |>
   phs_annotate(.font_size = c(type = 0, id = 0), .keys = FALSE) |>
   print(preview = TRUE)
+```
+
+```{r echo=FALSE, out.width="80%"}
+knitr::include_graphics("img_phs_annotate_labels_only.png")
 ```
 
 ## Layout overview with `add_annotated_layouts()`
