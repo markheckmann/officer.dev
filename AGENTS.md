@@ -97,6 +97,17 @@ After integrating a feature:
 
 ## Style
 
+- Follow the [Tidyverse style guide](https://style.tidyverse.org/) with these highlights:
+  - `snake_case` for variables and functions
+  - `<-` for assignment, not `=`
+  - Spaces around infix operators (`+`, `-`, `<-`, `==`) except `::`, `$`, `[`, `^`
+  - Space after commas, not before
+  - `{` on same line, `}` on own line, body indented by 2 spaces
+  - Use `|>` (base pipe), not `%>%`
+  - Line length: aim for 80 characters, max 120
+  - Each pipe step on its own line, indented by 2 spaces
+  - Use `TRUE`/`FALSE`, not `T`/`F`
+  - Use `"` for strings, not `'`
 - No code comments unless explicitly requested
 - Follow existing code patterns (roxygen2 docs, testthat tests)
 - Use `xml2` for XML manipulation, `dplyr`/`tidyr` for data wrangling
