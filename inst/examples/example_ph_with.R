@@ -177,6 +177,26 @@ x <- ph_with(x, "A subtitle", 3) # id
 x <- ph_with(x, "A left text", "left") # keyword
 x <- ph_with(x, Sys.Date(), "dt[1]") # type + index
 x <- ph_with(x, "More content", c(5, .5, 5, 2)) # numeric vector (left, top, width, heigh)
-# \dontrun{
-# print(x, preview = TRUE) # opens file locally
-# }
+\dontrun{
+print(x, preview = TRUE)}
+
+
+# Example passing ph modifiers via dots (...) ----
+colored_text <- fpar(ftext("some colored text  ...", prop = fp_text_lite(color = "red")))
+ext_img <- external_img(system.file("img/dog.png", package = "officer"), guess_size = TRUE)
+my_line <- sp_line("red", lty = "dash", lwd = 2)
+bg <- "#ff000030"
+
+x <- read_pptx()
+# slide with text
+x <- add_slide(x, "Two Content")
+x <- ph_with(x, "The Title", "title", bg = "#0000ff30", ln = "blue", geom = "horizontalScroll")
+x <- ph_with(x, "I am a star", "body[1]", geom = "star32", bg = "orange")
+x <- ph_with(x, colored_text, "body[2]", geom = "roundRect", rotation = 3, bg = bg, ln = "red")
+# slide with images
+x <- add_slide(x, "Two Content")
+x <- ph_with(x, "Doggies", "title", bg = "#0000ff30", geom = "downArrow", ln = "blue")
+x <- ph_with(x, ext_img, "body[1]", use_loc_size = FALSE, bg = bg, rotation = -3, ln = my_line)
+x <- ph_with(x, ext_img, "body[2]", use_loc_size = FALSE, bg = "#00ff0030", rotation = 5)
+\dontrun{
+print(x, preview = TRUE)}

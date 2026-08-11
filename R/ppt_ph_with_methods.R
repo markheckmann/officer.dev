@@ -2,22 +2,18 @@
 
 #' @export
 #' @title Add objects on the current slide
-#' @description add an object into a new shape in the current slide. This
-#' function is able to add all supported outputs to a presentation. See
-#' section **Methods (by class)** to see supported outputs.
-#' @param x an rpptx object
-#' @param value object to add as a new shape. Supported objects
-#' are vectors, data.frame, graphics, block of formatted paragraphs,
-#' unordered list of formatted paragraphs,
-#' pretty tables with package flextable, editable graphics with
-#' package rvg, 'Microsoft' charts with package mschart.
-#' @param location a placeholder location object or a location short form. It will be used
-#' to specify the location of the new shape. This location can be defined with a call to one
-#' of the `ph_location_*` functions (see section `"see also"`). In `ph_with()`, several location
-#' short forms can be used, as listed in section `"Short forms"`.
-#' @param ... further arguments passed to or from other methods. When
-#' adding a `ggplot` object or `plot_instr`, these arguments will be used
-#' by the png function.
+#' @description Add an object into a new shape in the current slide. This function is able to add all supported outputs
+#'   to a presentation. See section **Methods (by class)** to see supported outputs.
+#' @param x An `rpptx` object.
+#' @param value Object to add as a new shape. Supported objects are vectors, data.frame, graphics, block of formatted
+#'   paragraphs, unordered list of formatted paragraphs, pretty tables with package flextable, editable graphics with
+#'   package rvg, 'Microsoft' charts with package mschart.
+#' @param location A placeholder location object or a location short form. It will be used to specify the location of
+#'   the new shape. This location can be defined with a call to one of the `ph_location_*` functions (see section
+#'   `"see also"`). In `ph_with()`, several location short forms can be used, as listed in section `"Short forms"`.
+#' @param ... Modifiers (key-value pairs) to change a placeholder's size, position or appearance (see section
+#'   `"Modifiers"`) *and* arguments passed to [ragg::agg_png()] (for `gg` or `plot_instr` objects only).
+#' @param .dots Pass `...` as named list.
 #'
 #' @section Short forms:
 #' The `location` argument of `ph_with()` either expects a location object as returned by the
@@ -33,21 +29,32 @@
 #' | `ph_location_id(1)`                         | `1`                        | Length 1 integer                                     |
 #' | `ph_location(0, 0, 4, 5)`                   | `c(0,0,4,5)`               | Length 4 numeric, optionally named, `c(top=0, left=0, ...)` |
 #'
+#' @section Modifiers:
+#' Use the following modifers to change the position, size and appearance of a placeholder. Note that the
+#' modifiers available depend on the class of the `value` object:
+#'
+#' | **Class of `value`**            | **Available modifiers**                                          | **`...` are also passed to** |
+#' |---------------------------------|------------------------------------------------------------------|------------------------------|
+#' | `data.frame`                    | `top`, `left`, `width`, `height`                                 |                              |
+#' | `gg`,`plot_instr`,`external_img`| `top`, `left`, `width`, `height`, `rotation`, `ln`, `bg`         | [ragg::agg_png()]            |
+#' | `<other objects>`               | `top`, `left`, `width`, `height`, `rotation`, `ln`, `bg`, `geom` | `format_fun` for `<numeric>` |
+#'
 #' @example inst/examples/example_ph_with.R
+#'
 #' @seealso Specify placeholder locations with [ph_location_type], [ph_location],
 #' [ph_location_label], [ph_location_left], [ph_location_right],
 #' [ph_location_fullsize], [ph_location_template]. [phs_with] is a sibling of
 #' `ph_with` that fills multiple placeholders at once. Use [add_slide] to add new slides.
+#'
 #' @section Illustrations:
 #'
 #' \if{html}{\figure{ph_with_doc_1.png}{options: style="width:80\%;"}}
-ph_with <- function(x, value, location, ...) {
+ph_with <- function(x, value, location, ..., .dots = NULL) {
   location <- resolve_location(location)
-  .ph_with(x, value, location, ...)
+  .ph_with(x, value, location, ..., .dots = .dots)
 }
 
-
-.ph_with <- function(x, value, location, ...) {
+.ph_with <- function(x, value, location, ..., .dots = NULL) {
   UseMethod("ph_with", value)
 }
 
@@ -55,10 +62,12 @@ ph_with <- function(x, value, location, ...) {
 #' @export
 #' @describeIn ph_with add a character vector to a new shape on the
 #' current slide, values will be added as paragraphs.
-ph_with.character <- function(x, value, location, ...) {
+ph_with.character <- function(x, value, location, ..., .dots = NULL) {
   slide <- x$slide$get_slide(x$cursor)
 
   location <- fortify_location(location, doc = x)
+  location <- update_location_from_dots(location, ..., .dots = .dots)
+
   new_ph <- shape_properties_tags(
     left = location$left,
     top = location$top,
@@ -92,15 +101,23 @@ ph_with.character <- function(x, value, location, ...) {
   x
 }
 
+
 #' @export
-#' @param format_fun format function for non character vectors
+#' @param format_fun Formatting function for non-character vectors (default [format()])
 #' @describeIn ph_with add a numeric vector to a new shape on the
 #' current slide, values will be be first formatted then
 #' added as paragraphs.
-ph_with.numeric <- function(x, value, location, format_fun = format, ...) {
+ph_with.numeric <- function(x, value, location, format_fun = format, ..., .dots = .dots) {
   slide <- x$slide$get_slide(x$cursor)
-  value <- format_fun(value, ...)
+
+  # make sure to only pass dots not meant for update_location_from_dots() to format_fun()
+  dots <- modifyList(list(...), .dots %||% list())
+  location_args <- c("left", "top", "width", "height", "ph_label", "ln", "bg", "rotation", "geom")
+  format_args <- dots[!names(dots) %in% location_args]
+  value <- do.call(match.fun(format_fun), c(list(value), format_args))
+
   location <- fortify_location(location, doc = x)
+  location <- update_location_from_dots(location, ..., .dots = .dots, discard_unkown_args = TRUE)
 
   new_ph <- shape_properties_tags(
     left = location$left,
@@ -133,15 +150,22 @@ ph_with.numeric <- function(x, value, location, format_fun = format, ...) {
   xml_add_child(xml_find_first(slide$get(), "//p:spTree"), node)
   x
 }
+
+
+#' @export
+#' @rdname ph_with
+ph_with.logical <- ph_with.numeric
+
 
 #' @export
 #' @describeIn ph_with add a factor vector to a new shape on the
 #' current slide, values will be be converted as character and then
 #' added as paragraphs.
-ph_with.factor <- function(x, value, location, ...) {
+ph_with.factor <- function(x, value, location, ..., .dots) {
   slide <- x$slide$get_slide(x$cursor)
   value <- as.character(value)
   location <- fortify_location(location, doc = x)
+  location <- update_location_from_dots(location, ..., .dots = .dots)
 
   new_ph <- shape_properties_tags(
     left = location$left,
@@ -174,9 +198,6 @@ ph_with.factor <- function(x, value, location, ...) {
   xml_add_child(xml_find_first(slide$get(), "//p:spTree"), node)
   x
 }
-#' @export
-#' @rdname ph_with
-ph_with.logical <- ph_with.numeric
 
 
 #' @export
@@ -185,7 +206,7 @@ ph_with.logical <- ph_with.numeric
 #' Set a global default via `options(officer.date_format = ...)`.
 #' @describeIn ph_with add a `Date` object vector to a new shape on the
 #' current slide, values will be be first converted to character.
-ph_with.Date <- function(x, value, location, date_format = NULL, ...) {
+ph_with.Date <- function(x, value, location, date_format = NULL, ..., .dots = NULL) {
   opt <- options()$officer.date_format
   if (!is.null(opt) && is.na(opt)) {
     # catch NA
@@ -193,7 +214,7 @@ ph_with.Date <- function(x, value, location, date_format = NULL, ...) {
   }
   format <- date_format %||% opt %||% "%Y-%m-%d" # fallback to format.Date() default
   value_str <- format(value, format = format)
-  ph_with(x, value = value_str, location, ...)
+  ph_with(x, value = value_str, location, ..., .dots = .dots)
 }
 
 
@@ -203,16 +224,11 @@ ph_with.Date <- function(x, value, location, date_format = NULL, ...) {
 #' item 1 level will be 1, item 2 level will be 2.
 #' @describeIn ph_with add a [block_list()] made
 #' of [fpar()] to a new shape on the current slide.
-ph_with.block_list <- function(
-  x,
-  value,
-  location,
-  level_list = integer(0),
-  ...
-) {
+ph_with.block_list <- function(x, value, location, level_list = integer(0), ..., .dots = NULL) {
   slide <- x$slide$get_slide(x$cursor)
 
   location <- fortify_location(location, doc = x)
+  location <- update_location_from_dots(location, ..., .dots = .dots)
 
   pars <- vapply(value, to_pml, character(1))
 
@@ -270,9 +286,10 @@ ph_with.block_list <- function(
 #' @export
 #' @describeIn ph_with add a [unordered_list()] made
 #' of [fpar()] to a new shape on the current slide.
-ph_with.unordered_list <- function(x, value, location, ...) {
+ph_with.unordered_list <- function(x, value, location, ..., .dots = NULL) {
   slide <- x$slide$get_slide(x$cursor)
   location <- fortify_location(location, doc = x)
+  location <- update_location_from_dots(location, ..., .dots = .dots)
 
   p <- to_pml(value)
 
@@ -343,16 +360,11 @@ ph_with.block_list_items <- function(x, value, location, ...) {
 #' @describeIn ph_with add a data.frame to a new shape on the current slide with
 #' function [block_table()]. Use package 'flextable' instead for more
 #' advanced formattings.
-ph_with.data.frame <- function(
-  x,
-  value,
-  location,
-  header = TRUE,
-  tcf = table_conditional_formatting(),
-  alignment = NULL,
-  ...
-) {
+ph_with.data.frame <- function(x, value, location, header = TRUE,
+                               tcf = table_conditional_formatting(),
+                               alignment = NULL, ..., .dots = NULL) {
   location <- fortify_location(location, doc = x)
+  location <- update_location_from_dots(location, ..., .dots = .dots)
 
   slide <- x$slide$get_slide(x$cursor)
   style_id <- x$table_styles$def[1]
@@ -398,16 +410,10 @@ ph_with.data.frame <- function(
 #' @param alt_text Alt-text for screen-readers. Defaults to `""`. If `""` or `NULL`
 #'    an alt text added with `ggplot2::labs(alt = ...)` will be used if any.
 #' @param scale Multiplicative scaling factor, same as in ggsave
-ph_with.gg <- function(
-  x,
-  value,
-  location,
-  res = 300,
-  alt_text = "",
-  scale = 1,
-  ...
-) {
+ph_with.gg <- function(x, value, location, res = 300, alt_text = "", scale = 1, ..., .dots = NULL) {
   location_ <- fortify_location(location, doc = x)
+  location <- update_location_from_dots(location, ..., .dots = .dots, discard_unkown_args = TRUE)
+
   slide <- x$slide$get_slide(x$cursor)
   if (!requireNamespace("ggplot2")) {
     stop("package ggplot2 is required to use this function")
@@ -419,16 +425,10 @@ ph_with.gg <- function(
 
   stopifnot(inherits(value, "gg"))
   file <- tempfile(fileext = ".png")
-  agg_png(
-    filename = file,
-    width = width,
-    height = height,
-    units = "in",
-    res = res,
-    scaling = scale,
-    background = "transparent",
-    ...
-  )
+
+  # agg_png_safe() filters args unknown to ragg::agg_png passed via dots
+  agg_png_safe(filename = file, width = width, height = height, units = "in", res = res, scaling = scale, background = "transparent", ...)
+
   print(value)
   dev.off()
   on.exit(unlink(file))
@@ -440,14 +440,17 @@ ph_with.gg <- function(
 
   ext_img <- external_img(file, width = width, height = height, alt = alt_text)
 
-  ph_with(x, ext_img, location = location)
+  ph_with(x, ext_img, location = location, ..., .dots = .dots)
 }
+
 
 #' @export
 #' @describeIn ph_with add an R plot to a new shape on the
 #' current slide. Use package 'rvg' for more advanced graphical features.
-ph_with.plot_instr <- function(x, value, location, res = 300, ...) {
+ph_with.plot_instr <- function(x, value, location, res = 300, ..., .dots = NULL) {
   location_ <- fortify_location(location, doc = x)
+  location_ <- update_location_from_dots(location_, ..., .dots = .dots, discard_unkown_args = TRUE)
+
   slide <- x$slide$get_slide(x$cursor)
   slide <- x$slide$get_slide(x$cursor)
   width <- location_$width
@@ -457,17 +460,10 @@ ph_with.plot_instr <- function(x, value, location, res = 300, ...) {
 
   dirname <- tempfile()
   dir.create(dirname)
-  filename <- file.path(dirname, "plot%03d.png")
-  agg_png(
-    filename = filename,
-    width = width,
-    height = height,
-    units = "in",
-    res = res,
-    scaling = 1,
-    background = "transparent",
-    ...
-  )
+
+  filename <- paste(dirname, "/plot%03d.png", sep = "")
+  # agg_png_safe() filters args unknown to ragg::agg_png passed via dots
+  agg_png_safe(filename = filename, width = width, height = height, units = "in", res = res, scaling = 1, background = "transparent", ...)
 
   tryCatch(
     {
@@ -488,7 +484,7 @@ ph_with.plot_instr <- function(x, value, location, res = 300, ...) {
   }
 
   ext_img <- external_img(file, width = width, height = height)
-  ph_with(x, ext_img, location = location)
+  ph_with(x, ext_img, location = location, ..., .dots = .dots)
 }
 
 
@@ -503,8 +499,9 @@ ph_with.plot_instr <- function(x, value, location, res = 300, ...) {
 #' specified in call to [external_img()] will be
 #' ignored, their values will be those of the location,
 #' unless use_loc_size is set to FALSE.
-ph_with.external_img <- function(x, value, location, use_loc_size = TRUE, ...) {
+ph_with.external_img <- function(x, value, location, use_loc_size = TRUE, ..., .dots = NULL) {
   location <- fortify_location(location, doc = x)
+  location <- update_location_from_dots(location, ..., .dots = .dots, discard_unkown_args = TRUE)
 
   slide <- x$slide$get_slide(x$cursor)
 
@@ -537,19 +534,21 @@ ph_with.external_img <- function(x, value, location, use_loc_size = TRUE, ...) {
 #' @export
 #' @describeIn ph_with add an [fpar()] to a new shape
 #' on the current slide as a single paragraph in a [block_list()].
-ph_with.fpar <- function(x, value, location, ...) {
-  ph_with.block_list(x, value = block_list(value), location = location)
-
+ph_with.fpar <- function(x, value, location, ..., .dots = NULL) {
+  ph_with.block_list(x, value = block_list(value), location = location, ..., .dots = .dots)
   x
 }
+
 
 #' @export
 #' @describeIn ph_with add an [empty_content()] to a new shape
 #' on the current slide.
-ph_with.empty_content <- function(x, value, location, ...) {
+ph_with.empty_content <- function(x, value, location, ..., .dots = NULL) {
   slide <- x$slide$get_slide(x$cursor)
 
   location <- fortify_location(location, doc = x)
+  location <- update_location_from_dots(location, ..., .dots = .dots)
+
   new_ph <- shape_properties_tags(
     left = location$left,
     top = location$top,
@@ -743,4 +742,66 @@ phs_with <- function(x, ..., .dots = NULL, .slide_idx = NULL) {
   }
   x$cursor <- .old_cursor
   x
+}
+
+
+# HELPERS -------
+
+# convert to <sp_line> if character
+cast_to_sp_line <- function(x) {
+  if (is.null(x) || inherits(x, "sp_line") || is.na(x)) {
+    return(x)
+  }
+  if (is.character(x)) {
+    return(sp_line(color = x))
+  }
+  cli::cli_abort(c(
+    "Unkown input for {.val ln}: {.val x}",
+    "x" = "Must be character or an {.cls sp_line} object"
+  ))
+}
+
+
+update_location_from_dots <- function(x, ..., .dots = NULL, discard_unkown_args = FALSE) {
+  dots <- modifyList(list(...), .dots %||% list())
+  if (length(dots) == 0) {
+    return(x)
+  }
+  allowed <- c("left", "top", "width", "height", "ph_label", "ln", "bg", "rotation", "geom")
+  arg_nms <- names(dots)
+  ii <- pmatch(arg_nms, allowed)
+  ii_na <- is.na(ii)
+  if (discard_unkown_args) { # discard and and redo
+    dots <- dots[!ii_na]
+    arg_nms <- names(dots)
+    ii <- pmatch(arg_nms, allowed)
+    ii_na <- is.na(ii)
+  }
+  if (any(ii_na)) {
+    cli::cli_abort(
+      c("Arg{?s} passed via ... could not be matched (unambigously): {.val {arg_nms[ii_na]}}",
+        "x" = "Known args are: {.val {allowed}}"
+      ),
+      call = NULL
+    )
+  }
+  names(dots) <- allowed[ii]
+  x <- modifyList(x, dots)
+  x$ln <- cast_to_sp_line(x$ln)
+  x
+}
+
+
+# version of ragg::agg_png() which removes any unknown ... and .dots args
+# and filters duplicate args (last instance is used)
+agg_png_safe <- function(..., .dots = NULL) {
+  args_to_extract <- c(
+    "filename", "width", "height", "units", "pointsize",
+    "background", "res", "scaling", "snap_rect", "bitsize"
+  )
+  dots <- modifyList(list(...), .dots %||% list())
+  dots <- dots[!duplicated(names(dots), fromLast = TRUE)]
+  dot_args <- dots[args_to_extract]
+  args <- remove_null_entries(dot_args)
+  do.call(ragg::agg_png, args = args)
 }
