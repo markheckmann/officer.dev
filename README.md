@@ -48,6 +48,20 @@ Features and fixes are developed in the
 repository. When upstream merges a change, it is picked up automatically
 during the next sync via `git merge upstream/main`.
 
+### Branch structure
+
+- `main` – stable, releasable
+- `dev` – integration branch for new features and upstream syncs
+- `upstream-pr-xxx` / `feature/xxx` – temporary working branches
+
+### Development workflow
+
+1.  Develop feature on `markheckmann/officer` fork (feature branch)
+2.  Cherry-pick into `officer.dev` on a new branch off `dev`
+3.  PR into `dev`, squash-merge
+4.  When `dev` is stable, merge into `main`
+5.  Periodically sync upstream changes via `git merge upstream/main`
+
 ## Upstream
 
 This package tracks
