@@ -378,6 +378,12 @@ df_rename <- function(df, old, new) {
 }
 
 
+#' Check if is rpptx object
+#' @export
+#' @keywords internal
+is_rpptx <- function(x) inherits(x, "rpptx")
+
+
 # replacement for stopifnot() with nicer user feedback
 stop_if_not_class <- function(x, class, arg = NULL) {
   check <- inherits(x, what = class)
@@ -398,6 +404,9 @@ stop_if_not_class <- function(x, class, arg = NULL) {
 }
 
 
+#' Check if is  rpptx object
+#' @export
+#' @keywords internal
 stop_if_not_rpptx <- function(x, arg = NULL) {
   stop_if_not_class(x, "rpptx", arg)
 }
@@ -609,6 +618,21 @@ update_named_defaults <- function(
     res <- unlist(res)
   }
   res
+}
+
+
+# remove NULL entries from list or vector
+remove_null_entries <- function(x) {
+  Filter(function(z) !is.null(z), x)
+}
+
+
+# args: character vector of arg names ro extract
+# return: list
+extract_args_from_dots <- function(args, ..., .dots = NULL) {
+  dots <- modifyList(list(...), .dots %||% list())
+  dot_args <- dots[args]
+  remove_null_entries(dot_args)
 }
 
 

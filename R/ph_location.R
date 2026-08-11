@@ -468,7 +468,7 @@ fortify_location.location_type <- function(x, doc, ...) {
 #' @inherit ph_location details
 #' @example inst/examples/example_ph_location_label.R
 ph_location_label <- function(ph_label, newlabel = NULL, ...) {
-  x <- list(ph_label = unname(ph_label), label = unname(newlabel))
+  x <- list(ph_label = unname(ph_label), label = unname(newlabel), .dots = list(...))
   class(x) <- c("location_label", "location_str")
   x
 }
@@ -478,6 +478,8 @@ ph_location_label <- function(ph_label, newlabel = NULL, ...) {
 fortify_location.location_label <- function(x, doc, ...) {
   slide <- doc$slide$get_slide(doc$cursor)
   xfrm <- slide$get_xfrm()
+
+  .dots <- modifyList(x$.dots, list(...))
 
   layout <- unique(xfrm$name)
   master <- unique(xfrm$master_name)
@@ -544,6 +546,7 @@ fortify_location.location_label <- function(x, doc, ...) {
   )
   row.names(props) <- NULL
   out <- as_ph_location(props)
+  out <- modifyList(out, .dots)
   if (!is.null(x$label)) {
     out$ph_label <- x$label
   }

@@ -4,8 +4,8 @@
 \alias{ph_with}
 \alias{ph_with.character}
 \alias{ph_with.numeric}
-\alias{ph_with.factor}
 \alias{ph_with.logical}
+\alias{ph_with.factor}
 \alias{ph_with.Date}
 \alias{ph_with.block_list}
 \alias{ph_with.unordered_list}
@@ -19,21 +19,28 @@
 \alias{ph_with.xml_document}
 \title{Add objects on the current slide}
 \usage{
-ph_with(x, value, location, ...)
+ph_with(x, value, location, ..., .dots = NULL)
 
-ph_with.character(x, value, location, ...)
+ph_with.character(x, value, location, ..., .dots = NULL)
 
-ph_with.numeric(x, value, location, format_fun = format, ...)
+ph_with.numeric(x, value, location, format_fun = format, ..., .dots = .dots)
 
-ph_with.factor(x, value, location, ...)
+ph_with.logical(x, value, location, format_fun = format, ..., .dots = .dots)
 
-ph_with.logical(x, value, location, format_fun = format, ...)
+ph_with.factor(x, value, location, ..., .dots)
 
-ph_with.Date(x, value, location, date_format = NULL, ...)
+ph_with.Date(x, value, location, date_format = NULL, ..., .dots = NULL)
 
-ph_with.block_list(x, value, location, level_list = integer(0), ...)
+ph_with.block_list(
+  x,
+  value,
+  location,
+  level_list = integer(0),
+  ...,
+  .dots = NULL
+)
 
-ph_with.unordered_list(x, value, location, ...)
+ph_with.unordered_list(x, value, location, ..., .dots = NULL)
 
 ph_with.block_list_items(x, value, location, ...)
 
@@ -44,40 +51,55 @@ ph_with.data.frame(
   header = TRUE,
   tcf = table_conditional_formatting(),
   alignment = NULL,
-  ...
+  ...,
+  .dots = NULL
 )
 
-ph_with.gg(x, value, location, res = 300, alt_text = "", scale = 1, ...)
+ph_with.gg(
+  x,
+  value,
+  location,
+  res = 300,
+  alt_text = "",
+  scale = 1,
+  ...,
+  .dots = NULL
+)
 
-ph_with.plot_instr(x, value, location, res = 300, ...)
+ph_with.plot_instr(x, value, location, res = 300, ..., .dots = NULL)
 
-ph_with.external_img(x, value, location, use_loc_size = TRUE, ...)
+ph_with.external_img(
+  x,
+  value,
+  location,
+  use_loc_size = TRUE,
+  ...,
+  .dots = NULL
+)
 
-ph_with.fpar(x, value, location, ...)
+ph_with.fpar(x, value, location, ..., .dots = NULL)
 
-ph_with.empty_content(x, value, location, ...)
+ph_with.empty_content(x, value, location, ..., .dots = NULL)
 
 ph_with.xml_document(x, value, location, ...)
 }
 \arguments{
-\item{x}{an rpptx object}
+\item{x}{An \code{rpptx} object.}
 
-\item{value}{object to add as a new shape. Supported objects
-are vectors, data.frame, graphics, block of formatted paragraphs,
-unordered list of formatted paragraphs,
-pretty tables with package flextable, editable graphics with
+\item{value}{Object to add as a new shape. Supported objects are vectors, data.frame, graphics, block of formatted
+paragraphs, unordered list of formatted paragraphs, pretty tables with package flextable, editable graphics with
 package rvg, 'Microsoft' charts with package mschart.}
 
-\item{location}{a placeholder location object or a location short form. It will be used
-to specify the location of the new shape. This location can be defined with a call to one
-of the \verb{ph_location_*} functions (see section \code{"see also"}). In \code{ph_with()}, several location
-short forms can be used, as listed in section \code{"Short forms"}.}
+\item{location}{A placeholder location object or a location short form. It will be used to specify the location of
+the new shape. This location can be defined with a call to one of the \verb{ph_location_*} functions (see section
+\code{"see also"}). In \code{ph_with()}, several location short forms can be used, as listed in section \code{"Short forms"}.}
 
-\item{...}{further arguments passed to or from other methods. When
-adding a \code{ggplot} object or \code{plot_instr}, these arguments will be used
-by the png function.}
+\item{...}{Modifiers (key-value pairs) to change a placeholder's size, position or appearance (see section
+\code{"Modifiers"}) \emph{and} arguments passed to \code{\link[ragg:agg_png]{ragg::agg_png()}} (for \code{gg} or \code{plot_instr} objects only).}
 
-\item{format_fun}{format function for non character vectors}
+\item{.dots}{Pass \code{...} as named list.}
+
+\item{format_fun}{Formatting function for non-character vectors (default \code{\link[=format]{format()}})}
 
 \item{date_format}{A format string for dates (default \code{"\%Y-\%m-\%d"}).
 See \code{format} arg in \code{\link[=strftime]{strftime()}} for details.
@@ -105,9 +127,8 @@ an alt text added with \code{ggplot2::labs(alt = ...)} will be used if any.}
 be used.}
 }
 \description{
-add an object into a new shape in the current slide. This
-function is able to add all supported outputs to a presentation. See
-section \strong{Methods (by class)} to see supported outputs.
+Add an object into a new shape in the current slide. This function is able to add all supported outputs
+to a presentation. See section \strong{Methods (by class)} to see supported outputs.
 }
 \section{Functions}{
 \itemize{
@@ -175,6 +196,17 @@ The \code{location} argument of \code{ph_with()} either expects a location objec
    \code{ph_location_label("my_label")} \tab \code{"my_label"} \tab Any string not matching a keyword or type \cr
    \code{ph_location_id(1)} \tab \code{1} \tab Length 1 integer \cr
    \code{ph_location(0, 0, 4, 5)} \tab \code{c(0,0,4,5)} \tab Length 4 numeric, optionally named, \code{c(top=0, left=0, ...)} \cr
+}
+}
+
+\section{Modifiers}{
+
+Use the following modifers to change the position, size and appearance of a placeholder. Note that the
+modifiers available depend on the class of the \code{value} object:\tabular{lll}{
+   \strong{Class of \code{value}} \tab \strong{Available modifiers} \tab \strong{\code{...} are also passed to} \cr
+   \code{data.frame} \tab \code{top}, \code{left}, \code{width}, \code{height} \tab  \cr
+   \code{gg},\code{plot_instr},\code{external_img} \tab \code{top}, \code{left}, \code{width}, \code{height}, \code{rotation}, \code{ln}, \code{bg} \tab \code{\link[ragg:agg_png]{ragg::agg_png()}} \cr
+   \verb{<other objects>} \tab \code{top}, \code{left}, \code{width}, \code{height}, \code{rotation}, \code{ln}, \code{bg}, \code{geom} \tab \code{format_fun} for \verb{<numeric>} \cr
 }
 }
 
@@ -364,9 +396,29 @@ x <- ph_with(x, "A subtitle", 3) # id
 x <- ph_with(x, "A left text", "left") # keyword
 x <- ph_with(x, Sys.Date(), "dt[1]") # type + index
 x <- ph_with(x, "More content", c(5, .5, 5, 2)) # numeric vector (left, top, width, heigh)
-# \dontrun{
-# print(x, preview = TRUE) # opens file locally
-# }
+\dontrun{
+print(x, preview = TRUE)}
+
+
+# Example passing ph modifiers via dots (...) ----
+colored_text <- fpar(ftext("some colored text  ...", prop = fp_text_lite(color = "red")))
+ext_img <- external_img(system.file("img/dog.png", package = "officer"), guess_size = TRUE)
+my_line <- sp_line("red", lty = "dash", lwd = 2)
+bg <- "#ff000030"
+
+x <- read_pptx()
+# slide with text
+x <- add_slide(x, "Two Content")
+x <- ph_with(x, "The Title", "title", bg = "#0000ff30", ln = "blue", geom = "horizontalScroll")
+x <- ph_with(x, "I am a star", "body[1]", geom = "star32", bg = "orange")
+x <- ph_with(x, colored_text, "body[2]", geom = "roundRect", rotation = 3, bg = bg, ln = "red")
+# slide with images
+x <- add_slide(x, "Two Content")
+x <- ph_with(x, "Doggies", "title", bg = "#0000ff30", geom = "downArrow", ln = "blue")
+x <- ph_with(x, ext_img, "body[1]", use_loc_size = FALSE, bg = bg, rotation = -3, ln = my_line)
+x <- ph_with(x, ext_img, "body[2]", use_loc_size = FALSE, bg = "#00ff0030", rotation = 5)
+\dontrun{
+print(x, preview = TRUE)}
 }
 \seealso{
 Specify placeholder locations with \link{ph_location_type}, \link{ph_location},
