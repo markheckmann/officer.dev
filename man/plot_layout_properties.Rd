@@ -93,14 +93,10 @@ plot_layout_properties(x, layout = 4, cex = c(labels = .8, id = .7, type = .7))
 plot_layout_properties(x, 1, legend = TRUE)
 }
 \seealso{
-Other functions for reading presentation information:
+Other ppt_info:
+\code{\link[=add_annotated_layouts]{add_annotated_layouts()}},
 \code{\link[=annotate_base]{annotate_base()}},
-\code{\link[=color_scheme]{color_scheme()}},
-\code{\link[=doc_properties]{doc_properties()}},
-\code{\link[=layout_properties]{layout_properties()}},
-\code{\link[=layout_summary]{layout_summary()}},
-\code{\link[=length.rpptx]{length.rpptx()}},
-\code{\link[=slide_size]{slide_size()}},
-\code{\link[=slide_summary]{slide_summary()}}
+\code{\link[=phs_annotate]{phs_annotate()}},
+\code{\link[=slide_size]{slide_size()}}
 }
-\concept{functions for reading presentation information}
+\concept{ppt_info}

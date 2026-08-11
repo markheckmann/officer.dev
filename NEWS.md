@@ -1,3 +1,17 @@
+# officer 0.7.7.9002 (officer.dev)
+
+## Features
+
+- `phs_annotate()`: annotate placeholders of the current slide directly on the
+  `rpptx` object. Works well with `print(preview = TRUE)` for an interactive
+  workflow (#682).
+- `add_annotated_layouts()`: add annotated layout slides to an `rpptx` object
+  for selected layouts (#682).
+- `annotate_base()` rewritten: now shows type index (e.g. `body [3]`), uses `id`
+  instead of `index`, improved positioning and optional border (#682).
+- All `fortify_location.*` methods now return a `location_fortified` object with
+  entries `ph_id`, `type`, `type_idx`, `location_class` (#682).
+
 # officer 0.7.7.9001 (officer.dev)
 
 ## Features
@@ -187,6 +201,7 @@ and is therefore no longer useful to end users.
 
 ## Issues
 
+- WIP: phs_annotate() (#682)
 - Fix RTF sections that were sometimes invisible
 - issue with image in google docs should now be fixed (#689)
 - add automatically namespaces when calling `write_elements_to_context()`
@@ -207,7 +222,6 @@ to change the list separator, etc.
 
 ## Issues
 
-- Fix Rmd output with paragraphs `fpar()` so that no stylename is used.
 - Improve `set_doc_properties()` error and warning messages.
 - `page_size()` now manage correctly sizes if `orient = "landscape"` and not 
 `unit = "in"`.
@@ -218,6 +232,11 @@ a Word document.
 - argument `separator` is not used anymore in `block_toc`. Now the Word field is 
 generated with no separator making it more portable over the different locales 
 Word users could have.
+
+## Internals
+
+- All `fortify_location.*` methods now return a `location_fortified` object. The object now consistently have the 
+  entries `ph_id`, `type`, `type_idx`, `location_class`. This information is sometimes needed downstream.
 
 # officer 0.6.10
 
