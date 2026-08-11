@@ -131,24 +131,43 @@ knitr::include_graphics("img_spline_example.png")
 
 ## Images and plots with modifiers
 
-```{r eval = FALSE}
-img_file <- file.path(R.home("doc"), "html", "logo.jpg")
-ext_img <- external_img(img_file, width = 1.39, height = 1.08)
+Modifiers can also override position (`left`, `top`) and combine with
+`sp_line()` borders. Multiple `ph_with()` calls on the same slide stack
+content with different styles:
 
+```{r eval = FALSE}
+img_file <- system.file("img", "dog.png", package = "officer")
+ext_img <- external_img(img_file, width = 4, height = 3)
+my_line <- sp_line(color = "blue", lty = "dot", linecmpd = "dbl", lwd = 3)
 anyplot <- plot_instr(code = barplot(1:5, col = 2:6))
 
+p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
+  ggplot2::geom_point() +
+  ggplot2::theme_minimal(base_size = 15) +
+  ggplot2::theme(
+    plot.background  = ggplot2::element_rect(fill = "transparent", colour = NA),
+    panel.background = ggplot2::element_rect(fill = "transparent", colour = NA)
+  )
+
 read_pptx() |>
-  add_slide("Two Content") |>
-  ph_with(location = "body[1]", ext_img, use_loc_size = FALSE,
-          rot = 10, bg = "#ff000015", ln = "red") |>
-  add_slide("Two Content") |>
-  ph_with(location = "body[1]", anyplot,
-          rot = -5, bg = "#0000ff15", ln = "green") |>
+  # external_img with position overrides
+  add_slide("Two Content", title = "ph_with.external_img()") |>
+  ph_with(ext_img, "body", use_loc_size = FALSE, rot = 10, bg = "#ff000015") |>
+  ph_with(ext_img, "body", use_loc_size = FALSE, rot = -10, left = 5, top = 2.5, bg = "#ff00ff15") |>
+  ph_with(ext_img, "body", use_loc_size = FALSE, rot = 5, left = 3, top = 4, bg = "#0000ff15", ln = my_line) |>
+  # ggplot
+  add_slide("Two Content", title = "ph_with.gg()") |>
+  ph_with(p, "body", rot = 10, bg = "#ff000015") |>
+  ph_with(p, "body", rot = 5, left = 5, top = 2, bg = "#ff00ff15", scaling = 2, ln = my_line) |>
+  # plot_instr
+  add_slide("Two Content", title = "ph_with.plot_instr()") |>
+  ph_with(anyplot, "body", rot = 5, bg = "#ff000015", ln = "#ff000060") |>
+  ph_with(anyplot, "body", rot = -5, left = 5, top = 2, bg = "#0000ff15", ln = my_line, scaling = 1.5) |>
   print(target = tempfile(fileext = ".pptx"))
 ```
 
 ```{r echo = FALSE, out.width = "100%"}
-knitr::include_graphics("img_images_example.png")
+knitr::include_graphics("img_advanced_example.png")
 ```
 
 ## Notes
