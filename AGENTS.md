@@ -32,6 +32,8 @@ Rscript -e 'Sys.setenv(LANGUAGE = "en"); devtools::check()'
 
 - Tests require `LANGUAGE=en` (set in `.Renviron` and CI workflows)
 - Commit message prefixes: `feat:`, `fix:`, `doc:`, `internals:`
+- Commit title references the issue if applicable: `feat: use ... modifiers in ph_with (#681)`
+- Commit body should be detailed enough to understand the change without reading the diff
 - No direct development on `main`; work on `dev` or feature branches
 - PRs go `feature-branch → dev`, then `dev → main` when stable
 
