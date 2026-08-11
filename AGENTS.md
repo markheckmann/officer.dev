@@ -35,6 +35,13 @@ Rscript -e 'Sys.setenv(LANGUAGE = "en"); devtools::check()'
 - No direct development on `main`; work on `dev` or feature branches
 - PRs go `feature-branch → dev`, then `dev → main` when stable
 
+## Versioning
+
+- Upstream officer uses `.001` – `.999` for dev increments (e.g. `0.7.7.003`)
+- officer.dev uses `.9000+` (e.g. `0.7.7.9000`, `0.7.7.9001`)
+- This makes versions immediately distinguishable and ensures officer.dev is always numerically higher than upstream
+- When upstream releases a new version (e.g. `0.8.0`), officer.dev resets to `0.8.0.9000`
+
 ## Branch structure
 
 - `main` – stable/releasable
