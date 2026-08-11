@@ -340,7 +340,9 @@ test_that("as_ph_location", {
     "top",
     "ph_label",
     "ph",
+    "ph_id",
     "type",
+    "type_idx",
     "rotation",
     "fld_id",
     "fld_type"

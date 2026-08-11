@@ -14,4 +14,5 @@ existing ecosystem (mschart, flextable, rvg, officedown).
 
 | Description | Branch/Commit |
 |---|---|
+| `phs_annotate()`, `add_annotated_layouts()`, `annotate_base()` rewrite (#682) | `f24b2e14` |
 | Use `...` modifiers in `ph_with()` methods (#681) | `378c675b` |
