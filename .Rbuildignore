@@ -15,3 +15,5 @@
 ^tests/testthat/_snaps$
 ^LICENSE\.md$
 ^\.positai$
+^\.Renviron$
+^UPSTREAM\.md$
