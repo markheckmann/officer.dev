@@ -58,6 +58,10 @@ read_pptx() |>
   print(target = tempfile(fileext = ".pptx"))
 ```
 
+```{r echo = FALSE, out.width = "100%"}
+knitr::include_graphics("img_basic_example.png")
+```
+
 ## Using `.dots` for reusable styling
 
 When applying the same modifiers across multiple placeholders, collect them in
@@ -71,6 +75,10 @@ read_pptx() |>
   ph_with(location = "body[1]", "Text A", .dots = style) |>
   ph_with(location = "body[2]", "Text B", .dots = style) |>
   print(target = tempfile(fileext = ".pptx"))
+```
+
+```{r echo = FALSE, out.width = "100%"}
+knitr::include_graphics("img_dots_example.png")
 ```
 
 ## Modifiers with different content types
@@ -117,6 +125,10 @@ read_pptx() |>
   print(target = tempfile(fileext = ".pptx"))
 ```
 
+```{r echo = FALSE, out.width = "100%"}
+knitr::include_graphics("img_spline_example.png")
+```
+
 ## Images and plots with modifiers
 
 ```{r eval = FALSE}
@@ -133,6 +145,10 @@ read_pptx() |>
   ph_with(location = "body[1]", anyplot,
           rot = -5, bg = "#0000ff15", ln = "green") |>
   print(target = tempfile(fileext = ".pptx"))
+```
+
+```{r echo = FALSE, out.width = "100%"}
+knitr::include_graphics("img_images_example.png")
 ```
 
 ## Notes
