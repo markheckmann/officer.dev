@@ -59,6 +59,22 @@ git merge upstream/main
 
 Remote `upstream` points to `git@github.com:davidgohel/officer.git`.
 
+## Feature workflow
+
+Features are developed in the personal officer fork (`markheckmann/officer`) for upstream PRs, then cherry-picked into officer.dev:
+
+```bash
+# In officer.dev
+git switch dev && git pull
+git switch -c upstream-pr-xxx
+git fetch fork feature/xyz        # 'fork' remote = markheckmann/officer
+git cherry-pick <commit(s)>
+git push -u origin upstream-pr-xxx
+# → PR: upstream-pr-xxx → dev
+```
+
+If upstream merges the PR later, conflicts are resolved in favour of the upstream version during the next `git merge upstream/main`.
+
 ## Style
 
 - No code comments unless explicitly requested

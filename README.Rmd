@@ -48,6 +48,14 @@ read_docx()
 See [UPSTREAM.md](UPSTREAM.md) for a list of integrated upstream PRs and
 their current status.
 
+## How it works
+
+Features and fixes are developed in the
+[`markheckmann/officer`](https://github.com/markheckmann/officer) fork
+(for potential upstream contribution) and then cherry-picked into this
+repository. When upstream merges a change, it is picked up automatically
+during the next sync via `git merge upstream/main`.
+
 ## Upstream
 
 This package tracks [`davidgohel/officer`](https://github.com/davidgohel/officer).
