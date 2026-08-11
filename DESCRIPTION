@@ -70,6 +70,7 @@ Suggests:
     mschart,
     testthat,
     withr
+VignetteBuilder: knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Collate: 
