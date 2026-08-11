@@ -10,7 +10,8 @@ officer.dev
 
 It is **not intended to replace `officer`**. It is a drop-in replacement
 that provides early access to selected pull requests, fixes and features
-that are still pending in the upstream `officer` repository.
+that are still pending in the upstream `officer` repository, as well as
+additional features developed independently.
 
 The package name remains `officer`, so installing `officer.dev` replaces
 your existing `officer` installation.
