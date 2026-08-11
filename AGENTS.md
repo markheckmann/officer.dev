@@ -75,6 +75,23 @@ git push -u origin upstream-pr-xxx
 
 If upstream merges the PR later, conflicts are resolved in favour of the upstream version during the next `git merge upstream/main`.
 
+After integrating a feature:
+
+1. Create a vignette in `vignettes/` with examples and thumbnails
+2. Create a technical report in `features/` (e.g. `features/681_ph_with_dots.md`) documenting motivation, changes, affected files, implementation details, and what is needed for an upstream PR
+
+## Directory structure
+
+| Directory | Purpose |
+|-----------|---------|
+| `R/` | Package source code |
+| `tests/testthat/` | Unit tests |
+| `man/` | Generated roxygen documentation |
+| `vignettes/` | User-facing vignettes (one per feature) |
+| `features/` | Technical reports per feature (for upstream PR preparation) |
+| `inst/` | Installed files (templates, images, examples) |
+| `dev_local/` | Local-only dev notes (gitignored) |
+
 ## Style
 
 - No code comments unless explicitly requested
