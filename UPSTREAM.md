@@ -14,3 +14,4 @@ existing ecosystem (mschart, flextable, rvg, officedown).
 
 | Description | Branch/Commit |
 |---|---|
+| Use `...` modifiers in `ph_with()` methods (#681) | `378c675b` |
