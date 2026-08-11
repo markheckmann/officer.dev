@@ -79,6 +79,7 @@ After integrating a feature:
 
 1. Create a vignette in `vignettes/` with examples and thumbnails
 2. Create a technical report in `features/` (e.g. `features/681_ph_with_dots.md`) documenting motivation, changes, affected files, implementation details, and what is needed for an upstream PR
+3. Update `NEWS.md` with a short description under the current version heading
 
 ## Directory structure
 
