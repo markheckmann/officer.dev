@@ -735,6 +735,38 @@ is_integerish <- function(x) {
 }
 
 
+# code from tools::file_ext
+file_ext <- function(x) {
+  pos <- regexpr("\\.([[:alnum:]]+)$", x)
+  ifelse(pos > -1L, substring(x, pos + 1L), "")
+}
+
+
+mini_glue <- function(x, ..., .envir = parent.frame()) {
+  x <- as.character(x)
+  args <- list(...)
+  eval_env <- list2env(args, parent = .envir)
+
+  pat <- "\\{([^{}]+)\\}"
+
+  sapply(x, function(str) {
+    locs    <- gregexpr(pat, str, perl = TRUE)
+    matches <- regmatches(str, locs)[[1]]
+
+    if (length(matches) == 0) return(str)
+
+    replacements <- vapply(matches, function(m) {
+      expr_text <- sub("^\\{([^{}]+)\\}$", "\\1", m)
+      val <- eval(parse(text = expr_text), envir = eval_env)
+      paste(val, collapse = " ")
+    }, character(1))
+
+    regmatches(str, locs) <- list(replacements)
+    str
+  }, USE.NAMES = FALSE)
+}
+
+
 # file ops  ------------------------------------------
 
 #' Opens a file locally

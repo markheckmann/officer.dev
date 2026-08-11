@@ -39,8 +39,6 @@ This label can then be reused by other functions such as \code{ph_location_label
 It can be set with argument \code{newlabel}.
 }
 \examples{
-library(officer)
-
 doc <- read_pptx()
 doc <- add_slide(doc, "Comparison")
 plot_layout_properties(doc, "Comparison")
@@ -52,8 +50,9 @@ doc <- ph_with(doc, "The Footer", location = ph_location_id(id = 8)) # footer
 
 file <- tempfile(fileext = ".pptx")
 print(doc, file)
-
-## file.show(file) # may not work on your system
+\dontrun{
+file.show(file) # may not work on your system
+}
 }
 \seealso{
 Other functions for placeholder location:
