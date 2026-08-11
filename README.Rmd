@@ -47,7 +47,8 @@ read_docx()
 ## Additional changes
 
 See [UPSTREAM.md](UPSTREAM.md) for a list of integrated upstream PRs and
-their current status.
+their current status. Each feature has a detailed technical report in
+[`features/`](features/) for reference and upstream PR preparation.
 
 ## How it works
 
