@@ -1,3 +1,11 @@
+# officer 0.7.7.9001 (officer.dev)
+
+## Features
+
+- `ph_with()` methods now accept `...` modifiers (`bg`, `ln`, `rot`, `geom`,
+  `left`, `top`, `width`, `height`) to change placeholder appearance directly.
+  A `.dots` parameter allows passing modifiers as a reusable named list (#681).
+
 # officer 0.7.7
 
 ## Features
